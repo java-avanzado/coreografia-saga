@@ -1,0 +1,37 @@
+spring:
+  application:
+    name: payment-service
+  cloud:
+    function:
+      definition: processOrder;compensate
+    stream:
+      kafka:
+        binder:
+          brokers: localhost:19092
+      bindings:
+        ordersCreated-in-0:
+          destination: orders.created
+          contentType: application/json
+          group: payment
+        paymentsAuthorized-out-0:
+          destination: payments.authorized
+          contentType: application/json
+        paymentsFailed-out-0:
+          destination: payments.failed
+          contentType: application/json
+        paymentsCompensate-in-0:
+          destination: payments.compensate
+          contentType: application/json
+          group: payment
+        paymentsReverted-out-0:
+          destination: payments.reverted
+          contentType: application/json
+      function:
+        bindings:
+          processOrder-in-0: ordersCreated-in-0
+          compensate-in-0: paymentsCompensate-in-0
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,bindings
