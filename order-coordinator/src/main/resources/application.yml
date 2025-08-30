@@ -1,0 +1,40 @@
+spring:
+  application:
+    name: order-coordinator
+  cloud:
+    function:
+      definition: orderCreated;compensatePayment;payments;paymentsFailed;shipments;shipmentsFailed
+    stream:
+      kafka:
+        binder:
+          brokers: localhost:19092
+      bindings:
+        orderCreated-out-0:
+          destination: orders.created
+          contentType: application/json
+        compensatePayment-out-0:
+          destination: payments.compensate
+          contentType: application/json
+        payments-in-0:
+          destination: payments.authorized
+          contentType: application/json
+          group: coordinator
+        paymentsFailed-in-0:
+          destination: payments.failed
+          contentType: application/json
+          group: coordinator
+        shipments-in-0:
+          destination: shipments.reserved
+          contentType: application/json
+          group: coordinator
+        shipmentsFailed-in-0:
+          destination: shipments.failed
+          contentType: application/json
+          group: coordinator
+server:
+  port: 8080
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,bindings
