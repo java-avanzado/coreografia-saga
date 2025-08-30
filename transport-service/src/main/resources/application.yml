@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: transport-service
+  cloud:
+    function:
+      definition: reserveShipment
+    stream:
+      kafka:
+        binder:
+          brokers: localhost:19092
+      bindings:
+        paymentsAuthorized-in-0:
+          destination: payments.authorized
+          contentType: application/json
+          group: transport
+        shipmentsReserved-out-0:
+          destination: shipments.reserved
+          contentType: application/json
+        shipmentsFailed-out-0:
+          destination: shipments.failed
+          contentType: application/json
+      function:
+        bindings:
+          reserveShipment-in-0: paymentsAuthorized-in-0
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,bindings
