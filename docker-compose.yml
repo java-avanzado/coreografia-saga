@@ -1,0 +1,48 @@
+version: '3.8'
+services:
+  redpanda:
+    image: redpandadata/redpanda:v24.1.5
+    command:
+      - redpanda start
+      - --overprovisioned
+      - --smp=1
+      - --memory=512M
+      - --reserve-memory=0M
+      - --node-id=0
+      - --check=false
+      - --kafka-addr=PLAINTEXT://0.0.0.0:9092,OUTSIDE://0.0.0.0:19092
+      - --advertise-kafka-addr=PLAINTEXT://redpanda:9092,OUTSIDE://localhost:19092
+    ports:
+      - "19092:19092"
+      - "9644:9644"
+    volumes:
+      - redpanda-data:/var/lib/redpanda/data
+
+  order-coordinator:
+    image: com.example.saga/order-coordinator:1.0.0-SNAPSHOT
+    depends_on:
+      - redpanda
+    environment:
+      - SPRING_CLOUD_STREAM_KAFKA_BINDER_BROKERS=redpanda:9092
+      - SERVER_PORT=8080
+    ports:
+      - "8080:8080"
+
+  payment-service:
+    image: com.example.saga/payment-service:1.0.0-SNAPSHOT
+    depends_on:
+      - redpanda
+    environment:
+      - SPRING_CLOUD_STREAM_KAFKA_BINDER_BROKERS=redpanda:9092
+      - PAYMENT_FAIL_RATIO=0.2
+
+  transport-service:
+    image: com.example.saga/transport-service:1.0.0-SNAPSHOT
+    depends_on:
+      - redpanda
+    environment:
+      - SPRING_CLOUD_STREAM_KAFKA_BINDER_BROKERS=redpanda:9092
+      - SHIPMENT_FAIL_RATIO=0.2
+
+volumes:
+  redpanda-data:
