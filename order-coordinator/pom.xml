@@ -52,7 +52,15 @@
           <imageName>
             ${project.groupId}/${project.artifactId}:${project.version}
           </imageName>
+          <pullPolicy>IF_NOT_PRESENT</pullPolicy>
         </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>build-image-no-fork</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

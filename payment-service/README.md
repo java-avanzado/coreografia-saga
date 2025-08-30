@@ -30,3 +30,17 @@ mvn -q -pl payment-service -am spring-boot:run
 ## Notas
 
 - Este servicio no expone endpoints HTTP; trabaja únicamente por eventos.
+
+## Construir imagen Docker
+
+1. Construye el JAR:
+
+```bash
+mvn -q -pl payment-service -am -DskipTests package
+```
+
+2. Construye la imagen:
+
+```bash
+docker build -t com.example.saga/payment-service:1.0.0-SNAPSHOT -f Dockerfile .
+```

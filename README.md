@@ -27,25 +27,39 @@ docker compose up -d redpanda
 Esto levanta Redpanda exponiendo el broker en `localhost:19092` y
 `redpanda:9092` dentro de la red de Docker.
 
-## Construir imágenes Docker (Buildpacks)
+## Construir imágenes Docker (Dockerfile)
 
-Las imágenes Docker de todos los servicios se construyen automáticamente usando
-Buildpacks (Paketo) a través del plugin de Spring Boot. No necesitas Dockerfile.
+Debido a problemas con el comando spring-boot:build-image, ahora se incluyen
+Dockerfiles por servicio. El flujo recomendado es:
 
-Comandos para construir las imágenes:
+1) Construir los JARs con Maven (una sola vez):
 
 ```bash
-# Desde la raíz del proyecto puedes construir cada imagen
-mvn -q -pl order-coordinator -am -DskipTests spring-boot:build-image
-mvn -q -pl payment-service    -am -DskipTests spring-boot:build-image
-mvn -q -pl transport-service  -am -DskipTests spring-boot:build-image
+mvn -q -DskipTests clean package
 ```
 
-Esto generará las imágenes con los nombres:
+2) Construir las imágenes con Docker Compose (usa los Dockerfile de cada
+   módulo):
 
+```bash
+docker compose build
+```
+
+Esto creará las imágenes con los nombres:
 - com.example.saga/order-coordinator:1.0.0-SNAPSHOT
 - com.example.saga/payment-service:1.0.0-SNAPSHOT
 - com.example.saga/transport-service:1.0.0-SNAPSHOT
+
+Nota: Si prefieres construir individualmente:
+
+```bash
+# Desde cada módulo (tras mvn package)
+docker build -t com.example.saga/order-coordinator:1.0.0-SNAPSHOT -f order-coordinator/Dockerfile order-coordinator
+
+docker build -t com.example.saga/payment-service:1.0.0-SNAPSHOT -f payment-service/Dockerfile payment-service
+
+docker build -t com.example.saga/transport-service:1.0.0-SNAPSHOT -f transport-service/Dockerfile transport-service
+```
 
 ## Ejecutar con Docker Compose
 

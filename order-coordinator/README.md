@@ -52,3 +52,17 @@ La respuesta devuelve `orderId`. El servicio publicará `OrderCreated` en
 - Estado en memoria: se almacena un `Map<orderId, status>` para simplificar.
 - Compensación: si falla el envío, se emite `CompensatePayment` para revertir el
   cobro. Si falla el pago, se da por compensado.
+
+## Construir imagen Docker
+
+1. Construye el JAR:
+
+```bash
+mvn -q -pl order-coordinator -am -DskipTests package
+```
+
+2. Construye la imagen:
+
+```bash
+docker build -t com.example.saga/order-coordinator:1.0.0-SNAPSHOT -f Dockerfile .
+```

@@ -19,6 +19,9 @@ services:
       - redpanda-data:/var/lib/redpanda/data
 
   order-coordinator:
+    build:
+      context: ./order-coordinator
+      dockerfile: Dockerfile
     image: com.example.saga/order-coordinator:1.0.0-SNAPSHOT
     depends_on:
       - redpanda
@@ -29,6 +32,9 @@ services:
       - "8080:8080"
 
   payment-service:
+    build:
+      context: ./payment-service
+      dockerfile: Dockerfile
     image: com.example.saga/payment-service:1.0.0-SNAPSHOT
     depends_on:
       - redpanda
@@ -37,6 +43,9 @@ services:
       - PAYMENT_FAIL_RATIO=0.2
 
   transport-service:
+    build:
+      context: ./transport-service
+      dockerfile: Dockerfile
     image: com.example.saga/transport-service:1.0.0-SNAPSHOT
     depends_on:
       - redpanda
